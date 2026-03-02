@@ -1,6 +1,9 @@
 import { Youtube } from "iconoir-react";
 import Image from "next/image";
 import Link from "next/link";
+
+import { WatchlistToggleButton } from "@/features/watchlist/components/watchlist-toggle-button";
+import { createWatchlistMovieInputFromDetailItem } from "@/features/watchlist/lib/watchlist-movie";
 import type { MovieDetailItem } from "@/shared/lib/movie-detail-adapter";
 import {
   formatMovieDate,
@@ -72,6 +75,8 @@ export function MovieOverviewPanel({
   directors = [],
   trailerUrl,
 }: MovieOverviewPanelProps) {
+  const watchlistMovie = createWatchlistMovieInputFromDetailItem(movie);
+
   return (
     <section className="relative overflow-hidden">
       <div className="relative grid gap-6 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:gap-8">
@@ -93,6 +98,10 @@ export function MovieOverviewPanel({
 
           <div className="flex flex-wrap items-center gap-3">
             <MovieRatingRing voteAverage={movie.voteAverage} />
+            <WatchlistToggleButton
+              movie={watchlistMovie}
+              className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+            />
             {trailerUrl ? (
               <Link
                 href={trailerUrl}

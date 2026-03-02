@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
+import { WatchlistToggleButton } from "@/features/watchlist/components/watchlist-toggle-button";
+import { createWatchlistMovieInputFromListItem } from "@/features/watchlist/lib/watchlist-movie";
 import type { MovieListItem } from "@/shared/lib/movie-adapter";
 
 interface MovieGridProps {
@@ -23,40 +27,54 @@ function formatVote(voteAverage: number): string {
 }
 
 function MovieCard({ movie }: { movie: MovieListItem }) {
+  const watchlistMovie = createWatchlistMovieInputFromListItem(movie);
+
   return (
     <li className="group">
-      <Link
-        href={`/movie/${movie.id}`}
-        className="flex flex-col overflow-hidden rounded-md bg-white shadow-sm outline-none transition duration-300 hover:shadow-md"
-      >
+      <article className="flex h-full flex-col overflow-hidden rounded-md bg-white shadow-sm transition duration-300 hover:shadow-md">
         <div className="relative aspect-2/3 w-full overflow-hidden">
-          {movie.posterUrl ? (
-            <Image
-              src={movie.posterUrl}
-              alt={`${movie.title} 海报`}
-              fill
-              sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
-              暂无海报
-            </div>
-          )}
-          <span className="absolute right-3 top-3 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full bg-slate-900/82 px-2 text-xs font-semibold text-white">
+          <Link
+            href={`/movie/${movie.id}`}
+            className="block h-full outline-none"
+          >
+            {movie.posterUrl ? (
+              <Image
+                src={movie.posterUrl}
+                alt={`${movie.title} 海报`}
+                fill
+                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
+                暂无海报
+              </div>
+            )}
+          </Link>
+
+          <span className="absolute left-3 top-3 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full bg-slate-900/82 px-2 text-xs font-semibold text-white">
             {formatVote(movie.voteAverage)}
           </span>
         </div>
 
-        <div className="flex flex-col gap-2 p-4">
-          <h3 className="line-clamp-2 text-base font-semibold text-slate-900">
-            {movie.title}
-          </h3>
-          <p className="text-xs font-medium tracking-wide text-slate-600">
-            {movie.releaseDate}
-          </p>
+        <div className="p-4 flex items-start justify-between gap-2">
+          <div>
+            <Link href={`/movie/${movie.id}`} className="flex-1 outline-none">
+              <h3 className="line-clamp-2 text-base font-semibold text-slate-900">
+                {movie.title}
+              </h3>
+            </Link>
+            <p className="mt-2 text-xs font-medium tracking-wide text-slate-600">
+              {movie.releaseDate}
+            </p>
+          </div>
+
+          <WatchlistToggleButton
+            movie={watchlistMovie}
+            className="min-h-8 min-w-20 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
+          />
         </div>
-      </Link>
+      </article>
     </li>
   );
 }

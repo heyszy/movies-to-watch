@@ -1,6 +1,5 @@
-import { ArrowLeftCircle } from "iconoir-react";
+import { Garage, MediaVideoList } from "iconoir-react";
 import Link from "next/link";
-
 import { MovieCreditPanel } from "./components/movie-credit-panel";
 import { MovieOverviewPanel } from "./components/movie-overview-panel";
 import { MovieReviewPanel } from "./components/movie-review-panel";
@@ -19,12 +18,22 @@ function FullPageError({
 }) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-300 flex-col px-4 pb-14 pt-8 sm:px-6 lg:px-10">
-      <Link
-        href="/"
-        className="inline-flex min-h-10 w-fit items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
-      >
-        返回首页
-      </Link>
+      <header className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/"
+          className="inline-flex min-h-10 w-fit items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+        >
+          <Garage className="mr-2" />
+          返回首页
+        </Link>
+        <Link
+          href="/watchlist"
+          className="inline-flex min-h-10 w-fit items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+        >
+          <MediaVideoList className="mr-2" />
+          待看清单
+        </Link>
+      </header>
 
       <section className="mt-8 rounded-3xl bg-white px-6 py-10 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-900">详情加载失败</h1>
@@ -59,8 +68,19 @@ export async function MovieDetailPage({ movieId }: MovieDetailPageProps) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-300 flex-col px-4 pb-14 pt-8 sm:px-6 lg:px-10">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/">
-          <ArrowLeftCircle />
+        <Link
+          href="/"
+          className="inline-flex min-h-10 items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+        >
+          <Garage className="mr-2" />
+          返回首页
+        </Link>
+        <Link
+          href="/watchlist"
+          className="inline-flex min-h-10 items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+        >
+          <MediaVideoList className="mr-2" />
+          待看清单
         </Link>
       </header>
 

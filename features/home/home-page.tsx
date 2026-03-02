@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@base-ui/react/button";
+import { MediaVideoList } from "iconoir-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -49,10 +51,17 @@ export function HomePage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-300 flex-col px-4 pb-14 pt-8 sm:px-6 lg:px-10">
-      <header>
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           Movies To Watch
         </h1>
+        <Link
+          href="/watchlist"
+          className="inline-flex min-h-11 items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
+        >
+          <MediaVideoList className="mr-2" />
+          待看清单
+        </Link>
       </header>
 
       <div className="mt-8">
