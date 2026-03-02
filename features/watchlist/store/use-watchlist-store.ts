@@ -101,7 +101,9 @@ export const useWatchlistStore = create<WatchlistStore>()(
         items: state.items,
       }),
       merge: (persistedState, currentState) => {
-        const state = persistedState as Partial<PersistedWatchlistState>;
+        // 本地还没有写入过 key 时，persistedState 会是 undefined。
+        const state = (persistedState ??
+          {}) as Partial<PersistedWatchlistState>;
         const mergedItems = sanitizePersistedItems(state.items);
 
         return {
