@@ -3,16 +3,28 @@
 import { Button } from "@base-ui/react/button";
 import { MediaVideoList } from "iconoir-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
-
+import { BackToTopButton } from "./components/back-to-top-button";
 import { HomeFeedback } from "./components/home-feedback";
 import { HomeSearchBar } from "./components/home-search-bar";
+import { HomeSortSelect } from "./components/home-sort-select";
 import { MovieGrid, MovieGridSkeleton } from "./components/movie-grid";
 import { useHomeMovies } from "./hooks/use-home-movies";
+import {
+  type HomeSearchSortKey,
+  sortHomeSearchMovies,
+} from "./lib/home-movie-sort";
 
 export function HomePage() {
-  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const initialKeyword = searchParams.get("q")?.trim() ?? "";
+  const [keyword, setKeyword] = useState(initialKeyword);
+  const [searchSortKey, setSearchSortKey] =
+    useState<HomeSearchSortKey>("relevance");
   const { ref: loadMoreRef, inView } = useInView({
     rootMargin: "560px 0px",
   });
@@ -32,6 +44,41 @@ export function HomePage() {
     refetch,
   } = useHomeMovies(keyword);
 
+  /**
+   * URL 变化时同步输入框：
+   * 支持用户通过前进/后退或直接带 query 链接进入页面。
+   */
+  useEffect(() => {
+    const nextKeyword = searchParams.get("q")?.trim() ?? "";
+    setKeyword((currentKeyword) => {
+      return currentKeyword === nextKeyword ? currentKeyword : nextKeyword;
+    });
+  }, [searchParams]);
+
+  /**
+   * 把“当前已生效的关键词”写回 URL：
+   * - 使用 replace 避免每次输入都新增历史记录
+   * - scroll: false 避免更新 query 时页面跳动
+   */
+  useEffect(() => {
+    const currentKeywordInUrl = searchParams.get("q")?.trim() ?? "";
+    if (currentKeywordInUrl === debouncedKeyword) {
+      return;
+    }
+
+    const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+    if (debouncedKeyword) {
+      nextSearchParams.set("q", debouncedKeyword);
+    } else {
+      nextSearchParams.delete("q");
+    }
+
+    const nextQuery = nextSearchParams.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(nextUrl, { scroll: false });
+  }, [debouncedKeyword, pathname, router, searchParams]);
+
   useEffect(() => {
     /**
      * 当“加载更多”锚点进入可视区时自动拉取下一页。
@@ -43,6 +90,18 @@ export function HomePage() {
 
     void fetchNextPage();
   }, [fetchNextPage, hasNextPage, inView, isError, isFetchingNextPage]);
+
+  /**
+   * 排序仅作用于“搜索结果”：
+   * - 相关度保持 TMDB 返回顺序
+   */
+  const displayMovies = useMemo(() => {
+    if (source !== "search") {
+      return movies;
+    }
+
+    return sortHomeSearchMovies(movies, searchSortKey);
+  }, [movies, searchSortKey, source]);
 
   const hasMovies = movies.length > 0;
   const showSkeleton = isPending && !hasMovies;
@@ -77,6 +136,15 @@ export function HomePage() {
         />
       </div>
 
+      {source === "search" && hasMovies ? (
+        <div className="mt-4">
+          <HomeSortSelect
+            value={searchSortKey}
+            onValueChange={setSearchSortKey}
+          />
+        </div>
+      ) : null}
+
       <section className="mt-8" aria-label="电影列表区域">
         {showSkeleton ? <MovieGridSkeleton /> : null}
 
@@ -104,7 +172,7 @@ export function HomePage() {
 
         {!showSkeleton && !showError && !showEmpty ? (
           <>
-            <MovieGrid movies={movies} />
+            <MovieGrid movies={displayMovies} />
 
             <div className="mt-8 flex justify-center">
               <output
@@ -136,6 +204,8 @@ export function HomePage() {
           </>
         ) : null}
       </section>
+
+      <BackToTopButton />
     </main>
   );
 }
