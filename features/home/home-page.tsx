@@ -104,6 +104,7 @@ export function HomePage() {
   }, [movies, searchSortKey, source]);
 
   const hasMovies = movies.length > 0;
+  const isSearching = isFetching && !isFetchingNextPage;
   const showSkeleton = isPending && !hasMovies;
   const showError = isError && !hasMovies;
   const showEmpty = !isPending && !isError && !hasMovies;
@@ -126,9 +127,6 @@ export function HomePage() {
       <div className="mt-8">
         <HomeSearchBar
           keyword={keyword}
-          totalResults={totalResults}
-          source={source}
-          isLoading={isFetching && !isFetchingNextPage}
           onKeywordChange={setKeyword}
           onKeywordClear={() => {
             setKeyword("");
@@ -136,12 +134,18 @@ export function HomePage() {
         />
       </div>
 
-      {source === "search" && hasMovies ? (
-        <div className="mt-4">
-          <HomeSortSelect
-            value={searchSortKey}
-            onValueChange={setSearchSortKey}
-          />
+      {source === "search" ? (
+        <div className="mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-slate-600" aria-live="polite">
+            {!isSearching &&
+              `${totalResults.toLocaleString("zh-CN")} 条搜索结果`}
+          </div>
+          {hasMovies ? (
+            <HomeSortSelect
+              value={searchSortKey}
+              onValueChange={setSearchSortKey}
+            />
+          ) : null}
         </div>
       ) : null}
 

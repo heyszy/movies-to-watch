@@ -53,54 +53,48 @@ function CheckIcon(props: ComponentProps<"svg">) {
 
 export function HomeSortSelect({ value, onValueChange }: HomeSortSelectProps) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
-      <span className="text-sm text-slate-600">排序方式</span>
-      <Select.Root
-        items={HOME_SEARCH_SORT_OPTIONS}
-        value={value}
-        onValueChange={(nextValue) => {
-          if (isHomeSearchSortKey(nextValue)) {
-            onValueChange(nextValue);
-          }
-        }}
-      >
-        <Select.Trigger className="inline-flex min-h-10 min-w-56 items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-slate-200">
-          <Select.Value
-            className="data-placeholder:opacity-60"
-            placeholder="选择排序方式"
-          />
-          <Select.Icon className="flex text-slate-500">
-            <ChevronUpDownIcon />
-          </Select.Icon>
-        </Select.Trigger>
-        <Select.Portal>
-          <Select.Positioner
-            className="z-10 select-none outline-none"
-            sideOffset={8}
-          >
-            <Select.Popup className="rounded-xl border border-slate-200 bg-white">
-              <Select.ScrollUpArrow className="flex h-4 w-full cursor-default items-center justify-center text-xs text-slate-500" />
-              <Select.List className="max-h-60 overflow-y-auto py-1">
-                {HOME_SEARCH_SORT_OPTIONS.map((option) => (
-                  <Select.Item
-                    key={option.value}
-                    value={option.value}
-                    className="grid cursor-default grid-cols-[0.75rem_1fr] items-center gap-2 py-2 pl-2.5 pr-4 text-sm text-slate-700 outline-none data-[highlighted]:bg-slate-900 data-[highlighted]:text-slate-50"
-                  >
-                    <Select.ItemIndicator className="col-start-1">
-                      <CheckIcon className="size-3" />
-                    </Select.ItemIndicator>
-                    <Select.ItemText className="col-start-2">
-                      {option.label}
-                    </Select.ItemText>
-                  </Select.Item>
-                ))}
-              </Select.List>
-              <Select.ScrollDownArrow className="flex h-4 w-full cursor-default items-center justify-center text-xs text-slate-500" />
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Portal>
-      </Select.Root>
-    </div>
+    <Select.Root
+      items={HOME_SEARCH_SORT_OPTIONS}
+      value={value}
+      onValueChange={(nextValue) => {
+        if (isHomeSearchSortKey(nextValue)) {
+          onValueChange(nextValue);
+        }
+      }}
+    >
+      <Select.Trigger className="inline-flex min-h-10 min-w-56 items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-slate-200">
+        <Select.Value
+          className="data-placeholder:opacity-60"
+          placeholder="选择排序方式"
+        />
+        <Select.Icon className="flex text-slate-500">
+          <ChevronUpDownIcon />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner className="z-10 select-none outline-none" sideOffset={8}>
+          <Select.Popup className="rounded-xl border border-slate-200 bg-white">
+            <Select.ScrollUpArrow className="flex h-4 w-full cursor-default items-center justify-center text-xs text-slate-500" />
+            <Select.List className="max-h-60 overflow-y-auto py-1">
+              {HOME_SEARCH_SORT_OPTIONS.map((option) => (
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  className="grid cursor-default grid-cols-[0.75rem_1fr] items-center gap-2 py-2 pl-2.5 pr-4 text-sm text-slate-700 outline-none data-[highlighted]:bg-slate-900 data-[highlighted]:text-slate-50"
+                >
+                  <Select.ItemIndicator className="col-start-1">
+                    <CheckIcon className="size-3" />
+                  </Select.ItemIndicator>
+                  <Select.ItemText className="col-start-2">
+                    {option.label}
+                  </Select.ItemText>
+                </Select.Item>
+              ))}
+            </Select.List>
+            <Select.ScrollDownArrow className="flex h-4 w-full cursor-default items-center justify-center text-xs text-slate-500" />
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 }

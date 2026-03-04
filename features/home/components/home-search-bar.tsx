@@ -7,23 +7,15 @@ import { Xmark } from "iconoir-react";
 
 interface HomeSearchBarProps {
   keyword: string;
-  totalResults: number;
-  source: "search" | "trending";
-  isLoading: boolean;
   onKeywordChange: (value: string) => void;
   onKeywordClear: () => void;
 }
 
 export function HomeSearchBar({
   keyword,
-  totalResults,
-  source,
-  isLoading,
   onKeywordChange,
   onKeywordClear,
 }: HomeSearchBarProps) {
-  const modeLabel = source === "search" ? "搜索结果" : "本周趋势";
-
   return (
     <section aria-label="电影搜索">
       <Field.Root className="flex flex-col gap-3">
@@ -50,11 +42,6 @@ export function HomeSearchBar({
           ) : null}
         </div>
       </Field.Root>
-      <div className="mt-4 text-sm text-slate-600" aria-live="polite">
-        {source === "search" &&
-          !isLoading &&
-          `${modeLabel}：${totalResults.toLocaleString("zh-CN")} 条`}
-      </div>
     </section>
   );
 }
