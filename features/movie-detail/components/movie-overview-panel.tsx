@@ -19,21 +19,23 @@ interface MovieOverviewPanelProps {
 
 function MoviePoster({ movie }: { movie: MovieDetailItem }) {
   return (
-    <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-slate-100 shadow-lg shadow-lime-900/15">
-      {movie.posterUrl ? (
-        <Image
-          src={movie.posterUrl}
-          alt={`${movie.title} 海报`}
-          fill
-          sizes="(max-width: 768px) 100vw, 280px"
-          className="object-cover"
-          priority
-        />
-      ) : (
-        <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium tracking-wide text-slate-500">
-          暂无海报
-        </div>
-      )}
+    <div className="mx-auto w-full max-w-52 md:max-w-none">
+      <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-slate-100 shadow-lg shadow-lime-900/15">
+        {movie.posterUrl ? (
+          <Image
+            src={movie.posterUrl}
+            alt={`${movie.title} 海报`}
+            fill
+            sizes="(max-width: 768px) 208px, 240px"
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium tracking-wide text-slate-500">
+            暂无海报
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -79,7 +81,7 @@ export function MovieOverviewPanel({
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative grid gap-6 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:gap-8">
+      <div className="relative grid gap-6 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] lg:gap-8">
         <MoviePoster movie={movie} />
 
         <div className="flex flex-col gap-5">

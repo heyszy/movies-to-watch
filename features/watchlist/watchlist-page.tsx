@@ -9,6 +9,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { type ComponentProps, useMemo, useState } from "react";
 
+import { WatchLotteryDialog } from "./components/watch-lottery-dialog";
+import { WatchlistToggleButton } from "./components/watchlist-toggle-button";
 import {
   sortWatchlistMovies,
   WATCHLIST_SORT_OPTIONS,
@@ -78,7 +80,6 @@ export function WatchlistPage() {
   const movies = useWatchlistStore((state) => state.items);
   const hasHydrated = useWatchlistStore((state) => state.hasHydrated);
   const storageError = useWatchlistStore((state) => state.storageError);
-  const removeMovie = useWatchlistStore((state) => state.removeMovie);
   const clearMovies = useWatchlistStore((state) => state.clearMovies);
 
   /**
@@ -183,102 +184,107 @@ export function WatchlistPage() {
               </Select.Root>
             </Field.Root>
 
-            <Dialog.Root
-              open={isClearDialogOpen}
-              onOpenChange={setIsClearDialogOpen}
-            >
-              <Dialog.Trigger className="min-h-10 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-medium text-rose-700 hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-100">
-                清空清单
-              </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-900/30" />
-                <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-5 outline-none">
-                  <Dialog.Title className="text-lg font-semibold text-slate-900">
-                    确认清空待看清单？
-                  </Dialog.Title>
-                  <Dialog.Description className="mt-2 text-sm leading-6 text-slate-600">
-                    该操作会移除所有待看电影，且无法撤销。
-                  </Dialog.Description>
+            <div className="flex items-center gap-2">
+              <WatchLotteryDialog movies={sortedMovies} />
 
-                  <div className="mt-5 flex justify-end gap-2">
-                    <Dialog.Close className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">
-                      取消
-                    </Dialog.Close>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        clearMovies();
-                        setIsClearDialogOpen(false);
-                      }}
-                      className="inline-flex min-h-10 items-center rounded-xl bg-rose-600 px-4 text-sm font-medium text-white hover:bg-rose-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
-                    >
-                      确认清空
-                    </Button>
-                  </div>
-                </Dialog.Popup>
-              </Dialog.Portal>
-            </Dialog.Root>
+              <Dialog.Root
+                open={isClearDialogOpen}
+                onOpenChange={setIsClearDialogOpen}
+              >
+                <Dialog.Trigger className="min-h-10 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-medium text-rose-700 hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-100">
+                  清空清单
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-900/30" />
+                  <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-5 outline-none">
+                    <Dialog.Title className="text-lg font-semibold text-slate-900">
+                      确认清空待看清单？
+                    </Dialog.Title>
+                    <Dialog.Description className="mt-2 text-sm leading-6 text-slate-600">
+                      该操作会移除所有待看电影，且无法撤销。
+                    </Dialog.Description>
+
+                    <div className="mt-5 flex justify-end gap-2">
+                      <Dialog.Close className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">
+                        取消
+                      </Dialog.Close>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          clearMovies();
+                          setIsClearDialogOpen(false);
+                        }}
+                        className="inline-flex min-h-10 items-center rounded-xl bg-rose-600 px-4 text-sm font-medium text-white hover:bg-rose-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
+                      >
+                        确认清空
+                      </Button>
+                    </div>
+                  </Dialog.Popup>
+                </Dialog.Portal>
+              </Dialog.Root>
+            </div>
           </div>
 
-          <ul className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4">
+          <ul className="mt-5 flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-4 md:gap-5 lg:grid-cols-4">
             {sortedMovies.map((movie) => (
               <li
                 key={movie.id}
-                className="overflow-hidden rounded-3xl bg-white border border-slate-200"
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white sm:rounded-3xl"
               >
-                <Link
-                  href={`/movie/${movie.id}`}
-                  className="block outline-none hover:opacity-95"
-                >
-                  <div className="relative aspect-2/3 w-full overflow-hidden bg-slate-100">
-                    {movie.posterUrl ? (
-                      <Image
-                        src={movie.posterUrl}
-                        alt={`${movie.title} 海报`}
-                        fill
-                        sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
-                        暂无海报
+                <article className="flex sm:h-full sm:flex-col">
+                  <Link
+                    href={`/movie/${movie.id}`}
+                    className="block w-24 shrink-0 outline-none hover:opacity-95 sm:w-full"
+                  >
+                    <div className="relative aspect-2/3 w-full overflow-hidden bg-slate-100">
+                      {movie.posterUrl ? (
+                        <Image
+                          src={movie.posterUrl}
+                          alt={`${movie.title} 海报`}
+                          fill
+                          sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
+                          暂无海报
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-3 sm:p-4">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/movie/${movie.id}`}
+                        className="block outline-none hover:opacity-95"
+                      >
+                        <h2
+                          className="text-base font-semibold text-slate-900 sm:truncate"
+                          title={movie.title}
+                        >
+                          {movie.title}
+                        </h2>
+                      </Link>
+                      <div className="mt-2 hidden space-y-1 sm:block">
+                        <p className="text-xs text-slate-600">
+                          上映日期：{formatDate(movie.releaseDate)}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          TMDB 评分：{formatVote(movie.voteAverage)}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          加入时间：{formatDate(movie.addedAt)}
+                        </p>
                       </div>
-                    )}
-                  </div>
-                </Link>
+                    </div>
 
-                <div className="space-y-2 p-4">
-                  <h2 className="line-clamp-2 text-base font-semibold text-slate-900">
-                    {movie.title}
-                  </h2>
-                  <p className="text-xs text-slate-600">
-                    上映日期：{formatDate(movie.releaseDate)}
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    TMDB 评分：{formatVote(movie.voteAverage)}
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    加入时间：{formatDate(movie.addedAt)}
-                  </p>
-
-                  <div className="flex items-center gap-2 pt-1">
-                    <Link
-                      href={`/movie/${movie.id}`}
-                      className="inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
-                    >
-                      查看详情
-                    </Link>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        removeMovie(movie.id);
-                      }}
-                      className="inline-flex min-h-10 flex-1 items-center justify-center rounded-xl bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200"
-                    >
-                      移除
-                    </Button>
+                    <WatchlistToggleButton
+                      movie={movie}
+                      className="inline-flex min-h-9 w-fit items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200 sm:min-h-10 sm:w-full sm:justify-center"
+                    />
                   </div>
-                </div>
+                </article>
               </li>
             ))}
           </ul>

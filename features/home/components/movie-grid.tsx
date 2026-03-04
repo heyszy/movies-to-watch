@@ -31,8 +31,8 @@ function MovieCard({ movie }: { movie: MovieListItem }) {
 
   return (
     <li className="group">
-      <article className="flex h-full flex-col overflow-hidden rounded-md bg-white shadow-sm transition duration-300 hover:shadow-md">
-        <div className="relative aspect-2/3 w-full overflow-hidden">
+      <article className="flex overflow-hidden rounded-2xl border border-slate-200 bg-white sm:h-full sm:flex-col sm:rounded-md sm:border-0 sm:shadow-sm sm:transition sm:duration-300 sm:hover:shadow-md">
+        <div className="relative aspect-2/3 w-24 shrink-0 overflow-hidden bg-slate-100 sm:w-full">
           <Link
             href={`/movie/${movie.id}`}
             className="block h-full outline-none"
@@ -42,7 +42,7 @@ function MovieCard({ movie }: { movie: MovieListItem }) {
                 src={movie.posterUrl}
                 alt={`${movie.title} 海报`}
                 fill
-                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 33vw, 25vw"
+                sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover"
               />
             ) : (
@@ -52,26 +52,29 @@ function MovieCard({ movie }: { movie: MovieListItem }) {
             )}
           </Link>
 
-          <span className="absolute left-3 top-3 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full bg-slate-900/82 px-2 text-xs font-semibold text-white">
+          <span className="absolute left-2 top-2 inline-flex min-h-8 min-w-8 items-center justify-center rounded-full bg-slate-900/82 px-2 text-xs font-semibold text-white sm:left-3 sm:top-3 sm:min-h-9 sm:min-w-9">
             {formatVote(movie.voteAverage)}
           </span>
         </div>
 
-        <div className="p-4 flex items-start justify-between gap-2">
-          <div>
-            <Link href={`/movie/${movie.id}`} className="flex-1 outline-none">
-              <h3 className="line-clamp-2 text-base font-semibold text-slate-900">
+        <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-3 sm:p-4">
+          <div className="min-w-0">
+            <Link href={`/movie/${movie.id}`} className="block outline-none">
+              <h3
+                className="text-base font-semibold text-slate-900 sm:truncate"
+                title={movie.title}
+              >
                 {movie.title}
               </h3>
             </Link>
             <p className="mt-2 text-xs font-medium tracking-wide text-slate-600">
-              {movie.releaseDate}
+              {movie.releaseDate || "上映日期未知"}
             </p>
           </div>
 
           <WatchlistToggleButton
             movie={watchlistMovie}
-            className="min-h-8 min-w-20 rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
+            className="min-h-9 w-fit rounded-lg border border-slate-300 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-100 sm:min-h-8 sm:min-w-20"
           />
         </div>
       </article>
@@ -81,7 +84,7 @@ function MovieCard({ movie }: { movie: MovieListItem }) {
 
 export function MovieGrid({ movies }: MovieGridProps) {
   return (
-    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4">
+    <ul className="flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-4 md:gap-5 lg:grid-cols-4">
       {movies.map((movie) => (
         <MovieCard key={movie.id} movie={movie} />
       ))}
@@ -92,19 +95,23 @@ export function MovieGrid({ movies }: MovieGridProps) {
 export function MovieGridSkeleton() {
   return (
     <ul
-      className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4"
+      className="flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-4 md:gap-5 lg:grid-cols-4"
       aria-hidden
     >
       {SKELETON_KEYS.map((key) => (
         <li
           key={key}
-          className="h-full overflow-hidden rounded-3xl border border-slate-200 bg-white"
+          className="h-full overflow-hidden rounded-2xl border border-slate-200 bg-white sm:rounded-3xl"
         >
-          <div className="movie-skeleton aspect-2/3 w-full" />
-          <div className="space-y-3 p-4">
-            <div className="movie-skeleton h-4 w-3/4 rounded-full" />
-            <div className="movie-skeleton h-3 w-1/2 rounded-full" />
-            <div className="movie-skeleton h-3 w-full rounded-full" />
+          <div className="flex sm:block">
+            <div className="movie-skeleton aspect-2/3 w-24 shrink-0 sm:w-full" />
+            <div className="flex flex-1 flex-col justify-between gap-3 p-3 sm:space-y-3 sm:p-4">
+              <div className="space-y-2">
+                <div className="movie-skeleton h-4 w-3/4 rounded-full" />
+                <div className="movie-skeleton h-3 w-1/2 rounded-full" />
+              </div>
+              <div className="movie-skeleton h-9 w-20 rounded-lg sm:h-8" />
+            </div>
           </div>
         </li>
       ))}
