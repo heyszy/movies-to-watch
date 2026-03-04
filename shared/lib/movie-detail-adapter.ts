@@ -99,9 +99,18 @@ interface AdaptReviewsOptions {
   pageFallback: number;
 }
 
+const genreIdSchema = z.union([
+  z.number().int().positive(),
+  z
+    .string()
+    .trim()
+    .regex(/^\d+$/)
+    .transform((value) => Number(value)),
+]);
+
 const rawGenreSchema = z
   .object({
-    id: z.coerce.number(),
+    id: genreIdSchema,
     name: z.string().optional(),
   })
   .loose();
@@ -122,7 +131,7 @@ const rawMovieDetailSchema = z
     runtime: z.number().nullable().optional(),
     tagline: z.string().optional(),
     status: z.string().optional(),
-    genres: z.array(rawGenreSchema).optional(),
+    genres: z.unknown().optional(),
     original_language: z.string().optional(),
     adult: z.boolean().optional(),
   })
@@ -223,15 +232,11 @@ function buildImageUrl(
 }
 
 /**
- * 部分接口偶发把数组字段返回成对象，这里统一归一化成数组。
+ * 接口返回的不是数组时，返回空数组
  */
 function normalizeCollection(value: unknown): unknown[] {
   if (Array.isArray(value)) {
     return value;
-  }
-
-  if (value && typeof value === "object") {
-    return Object.values(value as Record<string, unknown>);
   }
 
   return [];
@@ -341,10 +346,17 @@ export function adaptMovieDetailResponse(
   }
 
   const movie = parsed.data;
-  const genres = (movie.genres ?? []).map((genre) => ({
-    id: genre.id,
-    name: genre.name?.trim() || "",
-  }));
+  /**
+   * 详情接口中的 genres 期望为数组；若后端返回了非数组或混入脏项，
+   * 这里统一降级为“空数组 / 跳过脏项”，避免整段详情数据 fallback。
+   */
+  const genres = normalizeCollection(movie.genres)
+    .map((rawGenre) => rawGenreSchema.safeParse(rawGenre))
+    .filter((result) => result.success)
+    .map((result) => ({
+      id: result.data.id,
+      name: result.data.name?.trim() || "",
+    }));
 
   return {
     movie: {

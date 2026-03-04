@@ -42,6 +42,15 @@ const rawListSchema = z
   })
   .loose();
 
+const genreIdSchema = z.union([
+  z.number().int().positive(),
+  z
+    .string()
+    .trim()
+    .regex(/^\d+$/)
+    .transform((value) => Number(value)),
+]);
+
 const rawMovieSchema = z
   .object({
     id: z.coerce.number(),
@@ -55,7 +64,7 @@ const rawMovieSchema = z
     vote_average: z.number().optional(),
     vote_count: z.number().optional(),
     popularity: z.number().optional(),
-    genre_ids: z.array(z.number()).optional(),
+    genre_ids: z.unknown().optional(),
     original_language: z.string().optional(),
     adult: z.boolean().optional(),
   })
@@ -64,7 +73,6 @@ const rawMovieSchema = z
 /**
  * 兼容后端不稳定场景：
  * - 正常是数组，直接返回
- * - 若被返回成对象，改成取 values
  * - 其他类型则视为空数据
  */
 function normalizeResultsCollection(results: unknown): unknown[] {
@@ -72,11 +80,30 @@ function normalizeResultsCollection(results: unknown): unknown[] {
     return results;
   }
 
-  if (results && typeof results === "object") {
-    return Object.values(results as Record<string, unknown>);
+  return [];
+}
+
+/**
+ * 列表接口中的 genre_ids 可能偶发异常：
+ * - 非数组 => []
+ * - 数组中非数字项 => 跳过
+ */
+function normalizeGenreIds(genreIds: unknown): number[] {
+  if (!Array.isArray(genreIds)) {
+    return [];
   }
 
-  return [];
+  const normalized: number[] = [];
+
+  for (const rawId of genreIds) {
+    const parsedId = genreIdSchema.safeParse(rawId);
+    if (!parsedId.success) {
+      continue;
+    }
+    normalized.push(parsedId.data);
+  }
+
+  return normalized;
 }
 
 /**
@@ -155,7 +182,7 @@ export function adaptMovieListResponse(
       voteAverage: Number(movie.vote_average ?? 0),
       voteCount: Number(movie.vote_count ?? 0),
       popularity: Number(movie.popularity ?? 0),
-      genreIds: movie.genre_ids ?? [],
+      genreIds: normalizeGenreIds(movie.genre_ids),
       originalLanguage: movie.original_language ?? "",
       adult: movie.adult ?? false,
     });
