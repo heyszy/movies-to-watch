@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { WatchlistToggleButton } from "@/features/watchlist/components/watchlist-toggle-button";
 import { createWatchlistMovieInputFromListItem } from "@/features/watchlist/lib/watchlist-movie";
+import { FallbackImage } from "@/shared/components/fallback-image";
 import type { MovieListItem } from "@/shared/lib/movie-adapter";
 
 interface MovieGridProps {
@@ -37,19 +37,14 @@ function MovieCard({ movie }: { movie: MovieListItem }) {
             href={`/movie/${movie.id}`}
             className="block h-full outline-none"
           >
-            {movie.posterUrl ? (
-              <Image
-                src={movie.posterUrl}
-                alt={`${movie.title} 海报`}
-                fill
-                sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
-                暂无海报
-              </div>
-            )}
+            <FallbackImage
+              src={movie.posterUrl}
+              alt={`${movie.title} 海报`}
+              sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
+              imageClassName="object-cover"
+              fallbackClassName="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500"
+              emptyText="暂无海报"
+            />
           </Link>
 
           <span className="absolute left-2 top-2 inline-flex min-h-8 min-w-8 items-center justify-center rounded-full bg-slate-900/82 px-2 text-xs font-semibold text-white sm:left-3 sm:top-3 sm:min-h-9 sm:min-w-9">

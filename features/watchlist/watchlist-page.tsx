@@ -5,10 +5,10 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Field } from "@base-ui/react/field";
 import { Select } from "@base-ui/react/select";
 import { Garage } from "iconoir-react";
-import Image from "next/image";
 import Link from "next/link";
 import { type ComponentProps, useMemo, useState } from "react";
 
+import { FallbackImage } from "@/shared/components/fallback-image";
 import { WatchLotteryDialog } from "./components/watch-lottery-dialog";
 import { WatchlistToggleButton } from "./components/watchlist-toggle-button";
 import {
@@ -237,19 +237,14 @@ export function WatchlistPage() {
                     className="block w-24 shrink-0 outline-none hover:opacity-95 sm:w-full"
                   >
                     <div className="relative aspect-2/3 w-full overflow-hidden bg-slate-100">
-                      {movie.posterUrl ? (
-                        <Image
-                          src={movie.posterUrl}
-                          alt={`${movie.title} 海报`}
-                          fill
-                          sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
-                          暂无海报
-                        </div>
-                      )}
+                      <FallbackImage
+                        src={movie.posterUrl}
+                        alt={`${movie.title} 海报`}
+                        sizes="(max-width: 640px) 96px, (max-width: 1024px) 33vw, 25vw"
+                        imageClassName="object-cover"
+                        fallbackClassName="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500"
+                        emptyText="暂无海报"
+                      />
                     </div>
                   </Link>
 

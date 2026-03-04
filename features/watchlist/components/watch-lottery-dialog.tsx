@@ -2,10 +2,10 @@
 
 import { Button } from "@base-ui/react/button";
 import { Dialog } from "@base-ui/react/dialog";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { FallbackImage } from "@/shared/components/fallback-image";
 import {
   buildLotteryFrames,
   LOTTERY_SLOT_COUNT,
@@ -21,23 +21,16 @@ interface WatchLotteryDialogProps {
 const REEL_SLOTS = ["left", "middle", "right"] as const;
 
 function LotteryPoster({ movie }: { movie: WatchlistMovie | null }) {
-  if (movie?.posterUrl) {
-    return (
-      <Image
-        src={movie.posterUrl}
-        alt={`${movie.title} 海报`}
-        fill
-        sizes="(max-width: 640px) 26vw, 110px"
-        loading="eager"
-        className="object-cover"
-      />
-    );
-  }
-
   return (
-    <div className="flex h-full items-center justify-center px-2 text-center text-xs font-medium text-slate-500">
-      暂无海报
-    </div>
+    <FallbackImage
+      src={movie?.posterUrl}
+      alt={`${movie?.title ?? "电影"} 海报`}
+      sizes="(max-width: 640px) 26vw, 110px"
+      loading="eager"
+      imageClassName="object-cover"
+      fallbackClassName="flex h-full items-center justify-center px-2 text-center text-xs font-medium text-slate-500"
+      emptyText="暂无海报"
+    />
   );
 }
 

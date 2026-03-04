@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { FallbackImage } from "@/shared/components/fallback-image";
 import type { MovieCreditsResponse } from "@/shared/lib/movie-detail-adapter";
 
 interface MovieCreditPanelProps {
@@ -25,19 +24,14 @@ function CastPhoto({
 }) {
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-2xl bg-slate-100">
-      {profileUrl ? (
-        <Image
-          src={profileUrl}
-          alt={`${name} 演员照片`}
-          fill
-          sizes="(max-width: 768px) 40vw, 180px"
-          className="object-cover"
-        />
-      ) : (
-        <div className="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500">
-          暂无照片
-        </div>
-      )}
+      <FallbackImage
+        src={profileUrl}
+        alt={`${name} 演员照片`}
+        sizes="(max-width: 768px) 40vw, 180px"
+        imageClassName="object-cover"
+        fallbackClassName="flex h-full items-center justify-center px-4 text-center text-sm font-medium tracking-wide text-slate-500"
+        emptyText="暂无照片"
+      />
     </div>
   );
 }
