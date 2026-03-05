@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { createApiErrorResponse, normalizePage } from "@/shared/lib/api-route";
 import { adaptMovieListResponse } from "@/shared/lib/movie-adapter";
+import { TMDB_CACHE_SECONDS } from "@/shared/lib/movie-cache-policy";
 import { tmdbGet } from "@/shared/lib/tmdb";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         page,
         language: "zh-CN",
       },
+      revalidateSeconds: TMDB_CACHE_SECONDS.trending,
     });
 
     const response = adaptMovieListResponse(rawResponse, {

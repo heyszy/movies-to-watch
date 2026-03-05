@@ -5,6 +5,7 @@ import {
   normalizeMovieId,
   normalizePage,
 } from "@/shared/lib/api-route";
+import { TMDB_CACHE_SECONDS } from "@/shared/lib/movie-cache-policy";
 import { adaptMovieReviewsResponse } from "@/shared/lib/movie-detail-adapter";
 import { tmdbGet } from "@/shared/lib/tmdb";
 
@@ -38,6 +39,7 @@ export async function GET(
         page,
         language: "zh-CN",
       },
+      revalidateSeconds: TMDB_CACHE_SECONDS.movieReviews,
     });
 
     return NextResponse.json(

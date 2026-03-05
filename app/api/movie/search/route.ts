@@ -20,8 +20,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   try {
     /**
-     * 这里只保留必要查询参数，避免路由层直接把前端任意参数透传到 TMDB。
-     * 后续若要支持更多条件（年份、地区），可在此处显式扩展。
+     * 只保留必要查询参数，避免路由层直接把前端任意参数透传到 TMDB。
+     * 搜索接口不启用服务端缓存，避免高基数关键词造成缓存膨胀。
      */
     const rawResponse = await tmdbGet<unknown>({
       path: "/search/movie",

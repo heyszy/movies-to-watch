@@ -11,6 +11,7 @@ type TmdbQueryValue = string | number | boolean | null | undefined;
 export interface TmdbGetOptions {
   path: string;
   query?: Record<string, TmdbQueryValue>;
+  revalidateSeconds?: number;
 }
 
 /**
@@ -86,10 +87,19 @@ export async function tmdbGet<T>(options: TmdbGetOptions): Promise<T> {
 
   headers.set("Authorization", `Bearer ${credential}`);
 
+  const revalidateInput = options.revalidateSeconds;
+  const revalidateSeconds =
+    typeof revalidateInput === "number" &&
+    Number.isFinite(revalidateInput) &&
+    revalidateInput > 0
+      ? Math.floor(revalidateInput)
+      : null;
   const response = await fetch(url, {
     method: "GET",
     headers,
-    cache: "no-store",
+    ...(revalidateSeconds
+      ? { next: { revalidate: revalidateSeconds } }
+      : { cache: "no-store" }),
   });
 
   if (!response.ok) {

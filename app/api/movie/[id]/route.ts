@@ -4,6 +4,7 @@ import {
   createApiErrorResponse,
   normalizeMovieId,
 } from "@/shared/lib/api-route";
+import { TMDB_CACHE_SECONDS } from "@/shared/lib/movie-cache-policy";
 import { adaptMovieDetailResponse } from "@/shared/lib/movie-detail-adapter";
 import { tmdbGet } from "@/shared/lib/tmdb";
 
@@ -34,6 +35,7 @@ export async function GET(
       query: {
         language: "zh-CN",
       },
+      revalidateSeconds: TMDB_CACHE_SECONDS.movieDetail,
     });
 
     return NextResponse.json(adaptMovieDetailResponse(rawResponse, movieId));
