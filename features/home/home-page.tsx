@@ -4,13 +4,13 @@ import { Button } from "@base-ui/react/button";
 import { MediaVideoList } from "iconoir-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { BackToTopButton } from "./components/back-to-top-button";
 import { HomeFeedback } from "./components/home-feedback";
 import { HomeSearchBar } from "./components/home-search-bar";
 import { HomeSortSelect } from "./components/home-sort-select";
-import { MovieGrid, MovieGridSkeleton } from "./components/movie-grid";
+import { MovieGridSkeleton, VirtualList } from "./components/movie-list";
 import { useHomeMovies } from "./hooks/use-home-movies";
 import {
   type HomeSearchSortKey,
@@ -25,9 +25,7 @@ export function HomePage() {
   const [keyword, setKeyword] = useState(initialKeyword);
   const [searchSortKey, setSearchSortKey] =
     useState<HomeSearchSortKey>("relevance");
-  const { ref: loadMoreRef, inView } = useInView({
-    rootMargin: "560px 0px",
-  });
+  const loadMoreLockedRef = useRef(false);
 
   const {
     keyword: debouncedKeyword,
@@ -79,21 +77,8 @@ export function HomePage() {
     router.replace(nextUrl, { scroll: false });
   }, [debouncedKeyword, pathname, router, searchParams]);
 
-  useEffect(() => {
-    /**
-     * 当“加载更多”锚点进入可视区时自动拉取下一页。
-     * 为避免重复触发，这里显式拦截正在请求、无下一页、或当前整体报错的场景。
-     */
-    if (!inView || !hasNextPage || isFetchingNextPage || isError) {
-      return;
-    }
-
-    void fetchNextPage();
-  }, [fetchNextPage, hasNextPage, inView, isError, isFetchingNextPage]);
-
   /**
-   * 排序仅作用于“搜索结果”：
-   * - 相关度保持 TMDB 返回顺序
+   * 排序仅作用于搜索结果，相关度保持 TMDB 原始顺序。
    */
   const displayMovies = useMemo(() => {
     if (source !== "search") {
@@ -109,8 +94,24 @@ export function HomePage() {
   const showError = isError && !hasMovies;
   const showEmpty = !isPending && !isError && !hasMovies;
 
+  const handleLoadMore = useCallback(() => {
+    if (
+      loadMoreLockedRef.current ||
+      isFetchingNextPage ||
+      !hasNextPage ||
+      isError
+    ) {
+      return;
+    }
+
+    loadMoreLockedRef.current = true;
+    void fetchNextPage().finally(() => {
+      loadMoreLockedRef.current = false;
+    });
+  }, [fetchNextPage, hasNextPage, isError, isFetchingNextPage]);
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-300 flex-col px-4 pb-14 pt-8 sm:px-6 lg:px-10">
+    <main className="mx-auto min-h-screen w-full max-w-300 px-4 pb-14 pt-8 sm:px-6 lg:px-10">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           Movies To Watch
@@ -140,6 +141,7 @@ export function HomePage() {
             {!isSearching &&
               `${totalResults.toLocaleString("zh-CN")} 条搜索结果`}
           </div>
+
           {hasMovies ? (
             <HomeSortSelect
               value={searchSortKey}
@@ -176,21 +178,12 @@ export function HomePage() {
 
         {!showSkeleton && !showError && !showEmpty ? (
           <>
-            <MovieGrid movies={displayMovies} />
-
-            <div className="mt-8 flex justify-center">
-              <output
-                ref={loadMoreRef}
-                className="inline-flex min-h-11 items-center rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-600 shadow-sm"
-                aria-live="polite"
-              >
-                {isFetchingNextPage
-                  ? "正在加载更多电影..."
-                  : hasNextPage
-                    ? "继续下滑即可加载下一页"
-                    : "已经到底了，去待看清单挑一部吧"}
-              </output>
-            </div>
+            <VirtualList
+              movies={displayMovies}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              onLoadMore={handleLoadMore}
+            />
 
             {isError ? (
               <div className="mt-4 flex justify-center">

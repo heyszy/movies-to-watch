@@ -72,7 +72,10 @@ export function HomeSortSelect({ value, onValueChange }: HomeSortSelectProps) {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Positioner className="z-10 select-none outline-none" sideOffset={8}>
+        <Select.Positioner
+          className="z-10 select-none outline-none"
+          sideOffset={8}
+        >
           <Select.Popup className="rounded-xl border border-slate-200 bg-white">
             <Select.ScrollUpArrow className="flex h-4 w-full cursor-default items-center justify-center text-xs text-slate-500" />
             <Select.List className="max-h-60 overflow-y-auto py-1">
